@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    tools:context=".MainActivity">
+
+    <!-- Status Section -->
+    <TextView
+        android:id="@+id/tv_root_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Root: Checking..."
+        android:textSize="14sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_gadget_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Gadget: Inactive"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Directory Selection -->
+    <TextView
+        android:id="@+id/tv_directory_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="NFC Dumps Directory:"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginTop="24dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_root_status" />
+
+    <Button
+        android:id="@+id/btn_select_directory"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select Directory"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_directory_label" />
+
+    <TextView
+        android:id="@+id/tv_directory_path"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="No directory selected"
+        android:textSize="12sp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintStart_toEndOf="@id/btn_select_directory"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/btn_select_directory"
+        app:layout_constraintBottom_toBottomOf="@id/btn_select_directory" />
+
+    <!-- File List -->
+    <TextView
+        android:id="@+id/tv_files_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Available Dump Files:"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btn_select_directory" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/file_recycler_view"
+        android:layout_width="0dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="8dp"
+        android:background="@android:color/darker_gray"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_files_label" />
+
+    <!-- Slot Controls -->
+    <TextView
+        android:id="@+id/tv_slots_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Portal Slots:"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/file_recycler_view" />
+
+    <LinearLayout
+        android:id="@+id/slot_buttons_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_slots_label">
+
+        <Button
+            android:id="@+id/btn_slot_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Slot 1"
+            android:layout_marginEnd="8dp" />
+
+        <Button
+            android:id="@+id/btn_slot_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Slot 2" />
+    </LinearLayout>
+
+    <!-- Current Slot Info -->
+    <LinearLayout
+        android:id="@+id/slot_info_layout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp"
+        android:background="@android:color/darker_gray"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/slot_buttons_layout">
+
+        <TextView
+            android:id="@+id/tv_current_slot"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Slot 1"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_slot_file"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No file assigned"
+            android:textSize="12sp"
+            android:layout_marginTop="4dp" />
+
+        <TextView
+            android:id="@+id/tv_slot_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Not loaded"
+            android:textSize="12sp"
+            android:layout_marginTop="4dp" />
+    </LinearLayout>
+
+    <!-- Slot Action Buttons -->
+    <LinearLayout
+        android:id="@+id/slot_actions_layout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/slot_info_layout">
+
+        <Button
+            android:id="@+id/btn_load_slot"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Load"
+            android:layout_marginEnd="4dp" />
+
+        <Button
+            android:id="@+id/btn_unload_slot"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Unload"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp" />
+
+        <Button
+            android:id="@+id/btn_send_sense"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Sense"
+            android:layout_marginStart="4dp" />
+    </LinearLayout>
+
+    <!-- Gadget Control Buttons -->
+    <TextView
+        android:id="@+id/tv_gadget_control_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="USB Gadget Control:"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/slot_actions_layout" />
+
+    <LinearLayout
+        android:id="@+id/gadget_control_layout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_gadget_control_label">
+
+        <Button
+            android:id="@+id/btn_start_gadget"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Start Gadget"
+            android:layout_marginEnd="4dp" />
+
+        <Button
+            android:id="@+id/btn_stop_gadget"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Stop Gadget"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp" />
+
+        <Button
+            android:id="@+id/btn_cleanup"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Cleanup"
+            android:layout_marginStart="4dp"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:backgroundTint="@android:color/holo_red_dark" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
