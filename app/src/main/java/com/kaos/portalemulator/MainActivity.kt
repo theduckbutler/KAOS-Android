@@ -278,15 +278,15 @@ class MainActivity : AppCompatActivity() {
                 val (disableResult, disableOutput) = runRootScriptWithOutput("""
                     # Stop Android USB services
                     stop adbd
-                    
+
                     # Disable current USB config
                     setprop sys.usb.config none
                     setprop sys.usb.state none
-                    
+
                     # Unbind ALL gadgets from UDC
                     UDC=$(ls /sys/class/udc | head -n1)
                     echo "Forcefully unbinding UDC: ${'$'}UDC"
-                    
+
                     for gadget in /config/usb_gadget/*/UDC; do
                         if [ -f "${'$'}gadget" ]; then
                             CURRENT=$(cat "${'$'}gadget" 2>/dev/null)
@@ -296,7 +296,7 @@ class MainActivity : AppCompatActivity() {
                             fi
                         fi
                     done
-                    
+
                     sleep 1
                     echo "USB disabled"
                 """.trimIndent())
@@ -329,24 +329,24 @@ class MainActivity : AppCompatActivity() {
                 val (mountResult, mountOutput) = runRootScriptWithOutput("""
                     # Create mount point
                     mkdir -p /dev/usb-ffs/portal0
-                    
+
                     # Check if already mounted
                     if mount | grep -q "portal0"; then
                         echo "Already mounted, unmounting first..."
                         umount /dev/usb-ffs/portal0 2>/dev/null || true
                         sleep 0.5
                     fi
-                    
+
                     # Mount FunctionFS
                     mount -t functionfs portal0 /dev/usb-ffs/portal0
-                    
+
                     if [ ${'$'}? -ne 0 ]; then
                         echo "Failed to mount FunctionFS"
                         exit 1
                     fi
-                    
+
                     echo "FunctionFS mounted successfully"
-                    
+
                     # CRITICAL: Fix ep0 permissions immediately
                     for i in 1 2 3 4 5; do
                         if [ -e /dev/usb-ffs/portal0/ep0 ]; then
@@ -358,16 +358,16 @@ class MainActivity : AppCompatActivity() {
                         echo "Waiting for ep0 to appear (attempt ${'$'}i)..."
                         sleep 0.2
                     done
-                    
+
                     # Verify ep0 exists
                     if [ ! -e /dev/usb-ffs/portal0/ep0 ]; then
                         echo "ERROR: ep0 did not appear after mount"
                         exit 1
                     fi
-                    
+
                     # Set SELinux permissive
                     setenforce 0 2>/dev/null || echo "Could not set SELinux permissive"
-                    
+
                     echo "Mount and permissions complete"
                     ls -la /dev/usb-ffs/portal0/
                     exit 0
@@ -481,9 +481,9 @@ class MainActivity : AppCompatActivity() {
                         echo "ERROR: No UDC found"
                         exit 1
                     fi
-                    
+
                     echo "Using UDC: ${'$'}UDC"
-                    
+
                     # Verify not already bound
                     CURRENT=$(cat /config/usb_gadget/kaos_portal/UDC 2>/dev/null)
                     if [ -n "${'$'}CURRENT" ]; then
@@ -491,13 +491,13 @@ class MainActivity : AppCompatActivity() {
                         echo "" > /config/usb_gadget/kaos_portal/UDC 2>&1
                         sleep 0.5
                     fi
-                    
+
                     # Bind to UDC
                     echo "Binding to ${'$'}UDC..."
                     if echo "${'$'}UDC" > /config/usb_gadget/kaos_portal/UDC 2>&1; then
                         echo "SUCCESS: Bound to UDC"
                         sleep 1
-                        
+
                         # Verify endpoints created
                         if [ -e /dev/usb-ffs/portal0/ep1 ] && [ -e /dev/usb-ffs/portal0/ep2 ]; then
                             echo "Data endpoints created successfully"
@@ -542,7 +542,7 @@ class MainActivity : AppCompatActivity() {
                         fi
                         sleep 0.3
                     done
-                    
+
                     ls -la /dev/usb-ffs/portal0/
                 """.trimIndent())
                 Log.d(TAG, "Data endpoint permissions: $permOutput")
@@ -654,10 +654,10 @@ class MainActivity : AppCompatActivity() {
                 val (reEnableResult, reEnableOutput) = runRootScriptWithOutput("""
                 # Restart ADB if desired
                 # start adbd
-                
+
                 # Or restore Android's default USB configuration
                 # setprop sys.usb.config adb
-                
+
                 echo "Cleanup complete"
             """.trimIndent())
                 Log.d(TAG, "Re-enable output: $reEnableOutput")
@@ -802,9 +802,9 @@ class MainActivity : AppCompatActivity() {
     private fun getGadgetSetupScript(): String {
         return """
             set -e
-            
+
             GADGET_DIR="/config/usb_gadget/kaos_portal"
-            
+
             if [ -d "${'$'}GADGET_DIR" ]; then
                 echo "Cleaning up existing gadget..."
                 if [ -f "${'$'}GADGET_DIR/UDC" ]; then
@@ -817,11 +817,11 @@ class MainActivity : AppCompatActivity() {
                 rmdir "${'$'}GADGET_DIR/strings/0x409" 2>/dev/null || true
                 rmdir "${'$'}GADGET_DIR" 2>/dev/null || true
             fi
-            
+
             echo "Creating gadget directory..."
             mkdir -p "${'$'}GADGET_DIR"
             cd "${'$'}GADGET_DIR"
-            
+
             # Device descriptor
             echo 0x1430 > idVendor
             echo 0x0150 > idProduct
@@ -831,25 +831,25 @@ class MainActivity : AppCompatActivity() {
             echo 0x00 > bDeviceSubClass
             echo 0x00 > bDeviceProtocol
             echo 64 > bMaxPacketSize0
-            
+
             # Device strings - THESE ARE WHAT WINDOWS SEES
             mkdir -p strings/0x409
             echo "Activision" > strings/0x409/manufacturer
             echo "Spyro Porta" > strings/0x409/product
             echo "99B3f9C9E6" > strings/0x409/serialnumber
-            
+
             # Configuration
             mkdir -p configs/c.1/strings/0x409
             echo "Portal Config" > configs/c.1/strings/0x409/configuration
             echo 250 > configs/c.1/MaxPower
             echo 0x80 > configs/c.1/bmAttributes
-            
+
             # FunctionFS function
             mkdir -p functions/ffs.portal0
-            
+
             # Link function
             ln -s "${'$'}GADGET_DIR/functions/ffs.portal0" "${'$'}GADGET_DIR/configs/c.1/ffs.portal0"
-            
+
             # Verify
             if [ -L "${'$'}GADGET_DIR/configs/c.1/ffs.portal0" ]; then
                 echo "✓ Setup complete"
@@ -863,39 +863,39 @@ class MainActivity : AppCompatActivity() {
     private fun getGadgetCleanupScript(): String {
         return """
             set -x
-            
+
             GADGET=/config/usb_gadget/kaos_portal
-            
+
             # Unbind from UDC
             if [ -f "${'$'}GADGET/UDC" ]; then
                 echo "" > "${'$'}GADGET/UDC" 2>/dev/null || true
                 sleep 0.5
             fi
-            
+
             # Unmount FunctionFS
             umount /dev/usb-ffs/portal0 2>/dev/null || true
             rmdir /dev/usb-ffs/portal0 2>/dev/null || true
-            
+
             # Remove symlink
             rm -f "${'$'}GADGET/configs/c.1/ffs.portal0" 2>/dev/null || true
-            
+
             # Remove function
             rmdir "${'$'}GADGET/functions/ffs.portal0" 2>/dev/null || true
-            
+
             # Remove config
             rmdir "${'$'}GADGET/configs/c.1/strings/0x409" 2>/dev/null || true
             rmdir "${'$'}GADGET/configs/c.1" 2>/dev/null || true
-            
+
             # Remove device strings
             rmdir "${'$'}GADGET/strings/0x409" 2>/dev/null || true
-            
+
             # Remove gadget
             rmdir "${'$'}GADGET" 2>/dev/null || true
-            
+
             # Restore Android USB
             setprop sys.usb.config mtp,adb
             start adbd
-            
+
             echo "Cleanup complete"
         """.trimIndent()
     }
@@ -958,7 +958,7 @@ class MainActivity : AppCompatActivity() {
             if mount | grep -q "portal0"; then
                 echo "Unmounting FunctionFS..."
                 umount /dev/usb-ffs/portal0 2>&1
-                
+
                 if [ ${'$'}? -eq 0 ]; then
                     echo "Unmounted successfully"
                 else
@@ -967,12 +967,12 @@ class MainActivity : AppCompatActivity() {
             else
                 echo "FunctionFS not mounted"
             fi
-            
+
             # Remove directory if it exists
             if [ -d /dev/usb-ffs/portal0 ]; then
                 rmdir /dev/usb-ffs/portal0 2>&1 || echo "Directory cleanup done"
             fi
-            
+
             # Verify
             if [ -d /dev/usb-ffs/portal0 ]; then
                 echo "WARNING: Directory still exists"
